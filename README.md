@@ -1,4 +1,6 @@
-> **STATUS: IN DEVELOPMENT**
+~~**STATUS: IN DEVELOPMENT**~~
+
+## ⚠️ **THIS REPOSITORY IS ARCHIVED**
 
 # Furnacely
 
