@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "furnacely",
+  "version": "0.1.0",
+  "name": "Furnacely",
+  "description": "Sequential 3-item smelt queue, fuel reserve, freeze-on-empty for the vanilla furnace. No speed boost, no new block — pure convenience.",
+  "authors": [
+    "Lotifo"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/furnacely",
+    "sources": "https://github.com/lot1fo/Furnacely",
+    "issues": "https://github.com/lot1fo/Furnacely/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/furnacely/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["net.lotifo.furnacely.Furnacely"],
+    "client": ["net.lotifo.furnacely.FurnacelyClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ]
+    }
+  }
+}

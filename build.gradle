@@ -1,0 +1,118 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'fabric-loom' version '1.9.1'
+    id 'com.diffplug.spotless' version '6.25.0'
+    id 'net.ltgt.errorprone' version '3.1.0'
+    id 'checkstyle'
+}
+
+version = project.mod_version
+group = project.mod_group
+
+base {
+    archivesName = project.mod_id
+}
+
+repositories {
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
+    mavenCentral()
+}
+
+// --- Loom configuration ---
+loom {
+    // Remap the mod jar to intermediary so it runs on obfuscated Minecraft.
+    // remapArchives = true
+}
+
+// --- Java toolchain ---
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+// --- Source layout ---
+sourceSets.main {
+    java.srcDirs = ['src/main/java']
+    resources.srcDirs = ['src/main/resources']
+}
+
+// --- Mod dependencies (Yarn mappings + Fabric Loader + Fabric API) ---
+dependencies {
+    minecraft "net.fabricmc:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    errorprone 'com.google.errorprone:error_prone_core:2.26.0'
+    errorprone 'com.uber.nullaway:nullaway:0.10.26'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+}
+
+// --- Spotless: google-java-format, applied on every build ---
+spotless {
+    java {
+        googleJavaFormat()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+// --- Run Spotless before every build so a clean tree is mandatory ---
+tasks.named('build') {
+    dependsOn 'spotlessCheck'
+}
+
+// --- JAR metadata ---
+jar {
+    from('LICENSE') {
+        rename { 'LICENSE' }
+    }
+}
+
+// --- Publishing: minimal, GitHub Packages-ready. ---
+publishing {
+    publications {
+        create('mavenJava', MavenPublication) {
+            from components.java
+            artifactId = project.mod_id
+        }
+    }
+    repositories {
+        // Add Modrinth/CurseForge or GitHub Packages publication here when ready.
+        // Left empty in the scaffold to keep credentials out of the public repo.
+    }
+}
+
+processResources {
+    filesMatching('fabric.mod.json') {
+        expand([
+                mod_id       : project.findProperty('mod_id'),
+                mod_name     : project.findProperty('mod_name'),
+                mod_license  : project.findProperty('mod_license'),
+                mod_version  : project.findProperty('mod_version'),
+                mod_group    : project.findProperty('mod_group'),
+                mod_authors  : project.findProperty('mod_authors'),
+                mod_description: project.findProperty('mod_description'),
+                minecraft_version: project.findProperty('minecraft_version'),
+                loader_version : project.findProperty('loader_version'),
+                fabric_version : project.findProperty('fabric_version'),
+                java_version   : project.findProperty('java_version'),
+        ])
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone {
+        option("NullAway:AnnotatedPackages", "net.lotifo.furnacely")
+    }
+}
+checkstyle {
+    configFile file("config/checkstyle/checkstyle.xml")
+    toolVersion '10.15.0'
+}
